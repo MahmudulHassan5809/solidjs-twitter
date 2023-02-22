@@ -4,9 +4,11 @@ import MainLayout from "../components/layouts/Main";
 import GlidePost from "../components/glides/GlidePost";
 import { Glide } from "../types/Glide";
 
+
 const HomeScreen: Component = () => {
   const [content, setContent] = createSignal("");
   const [glides, setGlides] = createSignal<Glide[]>([]);
+
   const createGlide = () => {
     const glide = {
       id: createUniqueId(),
