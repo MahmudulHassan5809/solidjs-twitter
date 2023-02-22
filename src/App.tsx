@@ -1,4 +1,4 @@
-import { Component, createSignal } from "solid-js";
+import { Component, createSignal, createUniqueId } from "solid-js";
 import { AiOutlineMessage } from "solid-icons/ai";
 import { FiTrash } from "solid-icons/fi";
 import { FaRegularImage, FaRegularHeart } from "solid-icons/fa";
@@ -13,10 +13,19 @@ const App: Component = () => {
   const [glides, setGlides] = createSignal<Glide[]>([]);
   const createGlide = () => {
     const glide = {
+      id: createUniqueId(),
       content: content(),
+      user: {
+        nickName: "Filip99",
+        avatar:
+          "https://www.pinclipart.com/picdir/middle/133-1331433_free-user-avatar-icons-happy-flat-design-png.png",
+      },
+      likesCount: 0,
+      subGlidesCount: 0,
+      date: new Date(),
     };
 
-    setGlides([glide]);
+    setGlides([glide, ...glides()]);
     setContent("");
   };
   return (
