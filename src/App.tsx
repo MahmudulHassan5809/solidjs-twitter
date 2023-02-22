@@ -4,8 +4,21 @@ import { FiTrash } from "solid-icons/fi";
 import { FaRegularImage, FaRegularHeart } from "solid-icons/fa";
 import MainLayout from "./components/layouts/Main";
 
+type Glide = {
+  content: string;
+};
+
 const App: Component = () => {
   const [content, setContent] = createSignal("");
+  const [glides, setGlides] = createSignal<Glide[]>([]);
+  const createGlide = () => {
+    const glide = {
+      content: content(),
+    };
+
+    setGlides([glide]);
+    setContent("");
+  };
   return (
     <MainLayout>
       <div class="flex-it py-1 px-4 flex-row">
@@ -24,6 +37,7 @@ const App: Component = () => {
               onInput={(event) => {
                 setContent(event.currentTarget.value);
               }}
+              value={content()}
               name="content"
               rows="1"
               id="glide"
@@ -40,10 +54,9 @@ const App: Component = () => {
             </div>
             <div class="flex-it w-32 mt-3 cursor-pointer">
               <button
+                onClick={createGlide}
                 type="button"
-                class="
-                            disabled:cursor-not-allowed disabled:bg-gray-400
-                            bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full flex-it transition duration-200"
+                class="disabled:cursor-not-allowed disabled:bg-gray-400 bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full flex-it transition duration-200"
               >
                 <div class="flex-it flex-row text-sm font-bold text-white items-start justify-center">
                   <span>Glide It</span>
@@ -53,7 +66,6 @@ const App: Component = () => {
           </div>
         </div>
         {/* MESSENGER END */}
-        {content()}
       </div>
       <div class="h-px bg-gray-700 my-1" />
       <div class="flex-it p-4 border-b-1 border-solid border-gray-700">
