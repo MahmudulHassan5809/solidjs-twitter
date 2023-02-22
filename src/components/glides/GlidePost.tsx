@@ -2,16 +2,18 @@ import { AiOutlineMessage } from "solid-icons/ai";
 import { FiTrash } from "solid-icons/fi";
 import { FaRegularHeart } from "solid-icons/fa";
 import { Component } from "solid-js";
+import { Glide } from "../../types/Glide";
 
-const GlidePost: Component<any> = (props) => (
+type Props = {
+  glide: Glide;
+};
+
+const GlidePost: Component<Props> = (props) => (
   <div class="flex-it p-4 border-b-1 border-solid border-gray-700">
     <div class="flex-it flex-row">
       <div class="flex-it mr-4">
         <div class="w-12 h-12 overflow-visible cursor-pointer transition duration-200 hover:opacity-80">
-          <img
-            class="rounded-full"
-            src="https://www.pinclipart.com/picdir/middle/133-1331433_free-user-avatar-icons-happy-flat-design-png.png"
-          ></img>
+          <img class="rounded-full" src={props.glide.user.avatar}></img>
         </div>
       </div>
       <article class="flex-it flex-grow flex-shrink cursor-pointer">
@@ -33,11 +35,11 @@ const GlidePost: Component<any> = (props) => (
         <div class="flex-it flex-row flex-grow text-gray-400">
           <div class="flex-it flex-row items-center cursor-pointer mr-5 transition hover:text-blue-400">
             <AiOutlineMessage size={18} />
-            <span class="text-xs ml-3">321</span>
+            <span class="text-xs ml-3">{props.glide.subGlidesCount}</span>
           </div>
           <div class="flex-it flex-row items-center cursor-pointer transition hover:text-pink-400">
             <FaRegularHeart size={18} />
-            <span class="text-xs ml-3">123</span>
+            <span class="text-xs ml-3">{props.glide.likesCount}</span>
           </div>
         </div>
       </article>

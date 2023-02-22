@@ -1,13 +1,8 @@
 import { Component, createSignal, createUniqueId, For } from "solid-js";
-import { AiOutlineMessage } from "solid-icons/ai";
-import { FiTrash } from "solid-icons/fi";
 import { FaRegularImage, FaRegularHeart } from "solid-icons/fa";
 import MainLayout from "./components/layouts/Main";
 import GlidePost from "./components/glides/GlidePost";
-
-type Glide = {
-  content: string;
-};
+import { Glide } from "./types/Glide";
 
 const App: Component = () => {
   const [content, setContent] = createSignal("");
