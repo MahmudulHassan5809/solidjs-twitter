@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
-import HomeScreen from "./screens/Home";
+import AppRouters from "./router";
 
 const App: Component = () => {
-  return <HomeScreen />;
+  return <AppRouters />;
 };
 
 export default App;
