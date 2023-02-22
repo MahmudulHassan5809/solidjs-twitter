@@ -78,7 +78,7 @@ const App: Component = () => {
         {/* MESSENGER END */}
       </div>
       <div class="h-px bg-gray-700 my-1" />
-      <For each={glides()}>{(glide) => <GlidePost />}</For>
+      <For each={glides()}>{(glide) => <GlidePost glide={glide} />}</For>
     </MainLayout>
   );
 };

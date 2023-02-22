@@ -3,7 +3,7 @@ import { FiTrash } from "solid-icons/fi";
 import { FaRegularHeart } from "solid-icons/fa";
 import { Component } from "solid-js";
 
-const GlidePost: Component = () => (
+const GlidePost: Component<any> = (props) => (
   <div class="flex-it p-4 border-b-1 border-solid border-gray-700">
     <div class="flex-it flex-row">
       <div class="flex-it mr-4">
@@ -18,7 +18,7 @@ const GlidePost: Component = () => (
         <div class="flex-it justify-center flex-grow mb-1">
           <div class="flex-it justify-between flex-row w-full">
             <div>
-              <span class="font-bold">Filip99</span>
+              <span class="font-bold">{props.glide.user.nickName}</span>
               <span class="mx-2">&#8226;</span>
               <span class="text-gray-400">2h</span>
             </div>
@@ -28,7 +28,7 @@ const GlidePost: Component = () => (
           </div>
         </div>
         <div class="flex-it flex-row flex-grow-0 items-center mb-2">
-          <div class="flex-it mr-3 mb-3 w-full">My First Post</div>
+          <div class="flex-it mr-3 mb-3 w-full">{props.glide.content}</div>
         </div>
         <div class="flex-it flex-row flex-grow text-gray-400">
           <div class="flex-it flex-row items-center cursor-pointer mr-5 transition hover:text-blue-400">
