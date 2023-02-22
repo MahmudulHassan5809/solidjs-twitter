@@ -1,3 +1,4 @@
+import { A } from "@solidjs/router";
 import { Component } from "solid-js";
 import MainLayout from "../components/layouts/Main";
 
@@ -89,9 +90,9 @@ const RegisterScreen: Component = () => {
               </div>
               <div class="text-sm text-gray-600 pb-4">
                 Already Registered?{" "}
-                <a class="hover:underline" href="#">
+                <A class="underline" href="/login">
                   Go to Login
-                </a>
+                </A>
               </div>
               <div class="flex-it py-2">
                 <button

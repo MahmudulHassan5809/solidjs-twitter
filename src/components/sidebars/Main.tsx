@@ -1,10 +1,7 @@
 import { Component, For } from "solid-js";
-import { CgProfile, CgMoreO } from "solid-icons/cg";
-import { IoNotificationsCircleOutline } from "solid-icons/io";
-import { RiMapCompassDiscoverLine } from "solid-icons/ri";
-import { AiOutlineHome } from "solid-icons/ai";
 import { FiMoreHorizontal } from "solid-icons/fi";
 import { links } from "./links";
+import { A } from "@solidjs/router";
 
 const MainSidebar: Component = () => (
   <header class="lg:flex-grow flex-it items-end">
@@ -21,7 +18,7 @@ const MainSidebar: Component = () => (
               <nav class="flex-it items-start">
                 <For each={links}>
                   {(link) => (
-                    <a
+                    <A
                       class="flex-it items-start flex-grow w-full"
                       href={link.href}
                     >
@@ -31,7 +28,7 @@ const MainSidebar: Component = () => (
                           <span class="truncate">{link.name}</span>
                         </div>
                       </div>
-                    </a>
+                    </A>
                   )}
                 </For>
               </nav>
