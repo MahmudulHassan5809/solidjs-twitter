@@ -31,4 +31,14 @@ export const links = [
     href: "/discover",
     icon: () => <RiMapCompassDiscoverLine size={24} />,
   },
+  {
+    name: "Login",
+    href: "/login",
+    icon: () => <IoNotificationsCircleOutline size={24} />,
+  },
+  {
+    name: "Register",
+    href: "/register",
+    icon: () => <RiMapCompassDiscoverLine size={24} />,
+  },
 ];
