@@ -1,20 +1,25 @@
 import { A } from '@solidjs/router';
-import { Component } from 'solid-js';
+import { Component, Show } from 'solid-js';
 import useForm, {
     firstUpperCaseLetter,
-    maxLengthValidator
+    FormError,
+    maxLengthValidator,
+    minLengthValidator,
+    requiredValidator
 } from '../hooks/useForm';
 import { RegisterForm } from '../types/Form';
 
 const RegisterScreen: Component = () => {
-    const { handleInput, submitForm, validate } = useForm<RegisterForm>({
-        fullName: '',
-        nickName: '',
-        email: '',
-        avatar: '',
-        password: '',
-        passwordConfirmation: ''
-    });
+    const { handleInput, submitForm, validate, errors } = useForm<RegisterForm>(
+        {
+            fullName: '',
+            nickName: '',
+            email: '',
+            avatar: '',
+            password: '',
+            passwordConfirmation: ''
+        }
+    );
 
     const onFormSubmit = (form: RegisterForm) => {
         console.log(form);
@@ -38,17 +43,18 @@ const RegisterScreen: Component = () => {
                                         <input
                                             onInput={handleInput}
                                             use:validate={[
-                                                maxLengthValidator,
-                                                firstUpperCaseLetter
+                                                requiredValidator,
+                                                firstUpperCaseLetter,
+                                                minLengthValidator
                                             ]}
                                             type="text"
                                             name="fullName"
                                             id="fullName"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                         />
-                                        <div class="flex-it grow text-xs bg-red-400 text-white p-3 pl-3 mt-1 rounded-md">
-                                            Error Error Beep Beep!
-                                        </div>
+                                        <FormError>
+                                            {errors['fullName']}
+                                        </FormError>
                                     </div>
 
                                     <div class="flex-it py-2">
@@ -56,13 +62,21 @@ const RegisterScreen: Component = () => {
                                             Nick Name
                                         </label>
                                         <input
-                                            use:validate={[maxLengthValidator]}
+                                            use:validate={[
+                                                maxLengthValidator,
+                                                (ele) =>
+                                                    minLengthValidator(ele, 2),
+                                                requiredValidator
+                                            ]}
                                             onInput={handleInput}
                                             type="text"
                                             name="nickName"
                                             id="nickName"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                         />
+                                        <FormError>
+                                            {errors['nickName']}
+                                        </FormError>
                                     </div>
 
                                     <div class="flex-it py-2">
@@ -70,12 +84,14 @@ const RegisterScreen: Component = () => {
                                             Email
                                         </label>
                                         <input
+                                            use:validate={[requiredValidator]}
                                             onInput={handleInput}
                                             type="text"
                                             name="email"
                                             id="email"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                         />
+                                        <FormError>{errors['email']}</FormError>
                                     </div>
 
                                     <div class="flex-it py-2">
@@ -83,12 +99,16 @@ const RegisterScreen: Component = () => {
                                             Avatar
                                         </label>
                                         <input
+                                            use:validate={[requiredValidator]}
                                             onInput={handleInput}
                                             type="text"
                                             name="avatar"
                                             id="avatar"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                         />
+                                        <FormError>
+                                            {errors['avatar']}
+                                        </FormError>
                                     </div>
 
                                     <div class="flex-it py-2">
@@ -96,12 +116,16 @@ const RegisterScreen: Component = () => {
                                             Password
                                         </label>
                                         <input
+                                            use:validate={[requiredValidator]}
                                             onInput={handleInput}
                                             type="password"
                                             name="password"
                                             id="password"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                         />
+                                        <FormError>
+                                            {errors['password']}
+                                        </FormError>
                                     </div>
 
                                     <div class="flex-it py-2">
@@ -110,11 +134,15 @@ const RegisterScreen: Component = () => {
                                         </label>
                                         <input
                                             onInput={handleInput}
+                                            use:validate={[requiredValidator]}
                                             type="password"
                                             name="passwordConfirmation"
                                             id="passwordConfirmation"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                         />
+                                        <FormError>
+                                            {errors['passwordConfirmation']}
+                                        </FormError>
                                     </div>
                                 </div>
                             </div>
