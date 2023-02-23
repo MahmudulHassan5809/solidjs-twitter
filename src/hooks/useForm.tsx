@@ -1,4 +1,4 @@
-import { Accessor, Component, For, ParentComponent, Show } from 'solid-js';
+import { Accessor, For, ParentComponent, Show } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import {
     Form,
@@ -15,7 +15,10 @@ declare module 'solid-js' {
     }
 }
 
-type Validator = (element: HTMLInputElement, ...rest: any[]) => string;
+type Validator = (
+    element: HTMLInputElement,
+    ...rest: any[]
+) => (form: Form) => string;
 type ValidatorConfig = { element: HTMLInputElement; validators: Validator[] };
 
 const niceName = (text: string) => {
@@ -38,48 +41,71 @@ export const FormError: ParentComponent = (props) => {
     );
 };
 
-export const maxLengthValidator: Validator = (
-    element: HTMLInputElement,
-    maxLength = 7
-) => {
-    if (element.value.length === 0 || element.value.length < maxLength) {
-        return '';
-    }
-    return `${niceName(
-        element.name
-    )} should be less than ${maxLength} characters`;
-};
+export const maxLengthValidator: Validator =
+    (element: HTMLInputElement, maxLength = 7) =>
+    (form: Form) => {
+        if (element.value.length === 0 || element.value.length < maxLength) {
+            return '';
+        }
+        return `${niceName(
+            element.name
+        )} should be less than ${maxLength} characters`;
+    };
 
-export const minLengthValidator: Validator = (
-    element: HTMLInputElement,
-    minLength = 3
-) => {
-    if (element.value.length === 0 || element.value.length > minLength) {
-        return '';
-    }
-    return `${niceName(
-        element.name
-    )} should be more than ${minLength} characters`;
-};
+export const minLengthValidator: Validator =
+    (element: HTMLInputElement, minLength = 3) =>
+    (form: Form) => {
+        if (element.value.length === 0 || element.value.length > minLength) {
+            return '';
+        }
+        return `${niceName(
+            element.name
+        )} should be more than ${minLength} characters`;
+    };
 
-export const requiredValidator: Validator = (element: HTMLInputElement) => {
-    return element.value.length === 0
-        ? `${niceName(element.name)} is required`
-        : '';
-};
+export const compareWith: Validator =
+    (element: HTMLInputElement, fieldName: string) => (form: Form) => {
+        if (element.value.length === 0) return '';
 
-export const firstUpperCaseLetter: Validator = (element: HTMLInputElement) => {
-    const { value } = element;
-    if (value.length === 0) return '';
-    return value[0] !== value[0].toUpperCase()
-        ? `${niceName(element.name)} first letter should be uppercase`
-        : '';
-};
+        const compareToFieldValue = form[fieldName];
+        return element.value !== compareToFieldValue
+            ? `${niceName(element.name)} should be same as ${niceName(
+                  fieldName
+              )}`
+            : '';
+    };
+
+export const requiredValidator: Validator =
+    (element: HTMLInputElement) => (form: Form) => {
+        return element.value.length === 0
+            ? `${niceName(element.name)} is required`
+            : '';
+    };
+
+export const firstUpperCaseLetter: Validator =
+    (element: HTMLInputElement) => (form: Form) => {
+        const { value } = element;
+        if (value.length === 0) return '';
+        return value[0] !== value[0].toUpperCase()
+            ? `${niceName(element.name)} first letter should be uppercase`
+            : '';
+    };
 
 const useForm = <T extends Form>(initialForm: T) => {
     const [form, setForm] = createStore(initialForm);
     const [errors, setErrors] = createStore<FormErrors>();
     const validatorFields: { [key: string]: ValidatorConfig } = {};
+
+    const isValid = () => {
+        const keys = Object.keys(errors);
+        if (keys.length === 0) {
+            return false;
+        }
+
+        return !keys.some((errorKey) => {
+            return errors[errorKey].length > 0;
+        });
+    };
 
     const handleInput = (e: GliderInputEvent) => {
         const { name, value } = e.currentTarget;
@@ -87,7 +113,13 @@ const useForm = <T extends Form>(initialForm: T) => {
     };
 
     const submitForm = (submitCallback: SubmitCallback<T>) => () => {
-        submitCallback(form);
+        for (const field in validatorFields) {
+            const config = validatorFields[field];
+            checkValidity(config)();
+        }
+        if (isValid()) {
+            submitCallback(form);
+        }
     };
 
     const validate = (
@@ -98,8 +130,10 @@ const useForm = <T extends Form>(initialForm: T) => {
         let config: ValidatorConfig;
         validatorFields[element.name] = config = { element, validators };
         element.onblur = checkValidity(config);
-
-        // element.oninput = checkValidity(config);
+        element.oninput = () => {
+            if (!errors[element.name]) return;
+            checkValidity(config)();
+        };
     };
 
     const checkValidity =
@@ -107,7 +141,7 @@ const useForm = <T extends Form>(initialForm: T) => {
         () => {
             setErrors(element.name, []);
             for (const validator of validators) {
-                const message = validator(element);
+                const message = validator(element)(form);
                 if (!!message) {
                     setErrors(
                         produce((errors) => {
