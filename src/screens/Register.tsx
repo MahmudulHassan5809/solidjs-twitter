@@ -1,7 +1,15 @@
 import { A } from '@solidjs/router';
-import { Component } from 'solid-js';
+import { Accessor, Component } from 'solid-js';
 import useForm from '../hooks/useForm';
 import { RegisterForm } from '../types/Form';
+
+declare module 'solid-js' {
+    namespace JSX {
+        interface Directives {
+            validate: number;
+        }
+    }
+}
 
 const RegisterScreen: Component = () => {
     const { handleInput, submitForm } = useForm<RegisterForm>({
@@ -16,6 +24,11 @@ const RegisterScreen: Component = () => {
     const onFormSubmit = (form: RegisterForm) => {
         console.log(form);
     };
+
+    const validate = (ref: HTMLInputElement, accessor: Accessor<number>) => {
+        console.log();
+    };
+
     return (
         <div class="flex-it justify-center items-center h-full">
             <div class="text-white text-4xl font-bold">
@@ -33,6 +46,7 @@ const RegisterScreen: Component = () => {
                                         </label>
                                         <input
                                             onInput={handleInput}
+                                            use:validate={100}
                                             type="text"
                                             name="fullName"
                                             id="fullName"
