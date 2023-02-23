@@ -1,18 +1,13 @@
 import { A } from '@solidjs/router';
-import { Accessor, Component } from 'solid-js';
-import useForm from '../hooks/useForm';
+import { Component } from 'solid-js';
+import useForm, {
+    firstUpperCaseLetter,
+    maxLengthValidator
+} from '../hooks/useForm';
 import { RegisterForm } from '../types/Form';
 
-declare module 'solid-js' {
-    namespace JSX {
-        interface Directives {
-            validate: number;
-        }
-    }
-}
-
 const RegisterScreen: Component = () => {
-    const { handleInput, submitForm } = useForm<RegisterForm>({
+    const { handleInput, submitForm, validate } = useForm<RegisterForm>({
         fullName: '',
         nickName: '',
         email: '',
@@ -23,10 +18,6 @@ const RegisterScreen: Component = () => {
 
     const onFormSubmit = (form: RegisterForm) => {
         console.log(form);
-    };
-
-    const validate = (ref: HTMLInputElement, accessor: Accessor<number>) => {
-        console.log();
     };
 
     return (
@@ -46,7 +37,10 @@ const RegisterScreen: Component = () => {
                                         </label>
                                         <input
                                             onInput={handleInput}
-                                            use:validate={100}
+                                            use:validate={[
+                                                maxLengthValidator,
+                                                firstUpperCaseLetter
+                                            ]}
                                             type="text"
                                             name="fullName"
                                             id="fullName"
@@ -62,6 +56,7 @@ const RegisterScreen: Component = () => {
                                             Nick Name
                                         </label>
                                         <input
+                                            use:validate={[maxLengthValidator]}
                                             onInput={handleInput}
                                             type="text"
                                             name="nickName"
