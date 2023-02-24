@@ -1,12 +1,14 @@
+import { register } from '../api/auth';
 import { RegisterForm } from '../types/Form';
 
 const useRegister = () => {
-    const register = (registerForm: RegisterForm) => {
-        alert(JSON.stringify(registerForm));
+    const registerUser = async (registerForm: RegisterForm) => {
+        const user = await register(registerForm);
+        console.log(user);
     };
 
     return {
-        register
+        registerUser
     };
 };
 

@@ -1,4 +1,13 @@
+import { DocumentReference } from 'firebase/firestore';
+
 export interface User {
-  nickName: string;
-  avatar: string;
+    uid: string;
+    nickName: string;
+    fullName: string;
+    email: string;
+    avatar: string;
+    followers: DocumentReference[];
+    followings: DocumentReference[];
+    followersCount: number;
+    followingCount: number;
 }
