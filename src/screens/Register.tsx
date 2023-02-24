@@ -1,5 +1,5 @@
 import { A } from '@solidjs/router';
-import { Component, Show } from 'solid-js';
+import { Component } from 'solid-js';
 import useForm, {
     compareWith,
     firstUpperCaseLetter,
@@ -8,9 +8,11 @@ import useForm, {
     minLengthValidator,
     requiredValidator
 } from '../hooks/useForm';
+import useRegister from '../hooks/useRegister';
 import { RegisterForm } from '../types/Form';
 
 const RegisterScreen: Component = () => {
+    const { register } = useRegister();
     const { handleInput, submitForm, validate, errors } = useForm<RegisterForm>(
         {
             fullName: '',
@@ -23,7 +25,7 @@ const RegisterScreen: Component = () => {
     );
 
     const onFormSubmit = (form: RegisterForm) => {
-        console.log(form);
+        register(form);
     };
 
     return (
