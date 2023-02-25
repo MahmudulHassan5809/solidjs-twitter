@@ -6,7 +6,7 @@ import useForm, { FormError, requiredValidator } from '../hooks/useForm';
 import { AuthForm } from '../types/Form';
 
 const LoginScreen: Component = () => {
-    const { authUser } = useAuth('login');
+    const { authUser, loading } = useAuth('login');
     const { handleInput, submitForm, validate, errors } = useForm<AuthForm>({
         email: '',
         password: ''
@@ -65,6 +65,7 @@ const LoginScreen: Component = () => {
                             </div>
                             <div class="flex-it py-2">
                                 <button
+                                    disabled={loading()}
                                     onClick={submitForm(onFormSubmit)}
                                     type="button"
                                     class="
