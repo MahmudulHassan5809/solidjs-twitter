@@ -4,8 +4,10 @@ import MainLayout from '../components/layouts/Main';
 import GlidePost from '../components/glides/GlidePost';
 import { Glide } from '../types/Glide';
 import { createStore, produce } from 'solid-js/store';
+import { useAuthState } from '../contexts/auth';
 
 const HomeScreen: Component = () => {
+    const { user } = useAuthState()!;
     const [content, setContent] = createSignal('');
     const [glides, setGlides] = createStore({
         items: [] as Glide[]
@@ -24,12 +26,12 @@ const HomeScreen: Component = () => {
             date: new Date()
         };
 
-        setGlides(
-            'items',
-            produce((items) => {
-                glides.items.unshift(glide);
-            })
-        );
+        // setGlides(
+        //     'items',
+        //     produce((items) => {
+        //         glides.items.unshift(glide);
+        //     })
+        // );
         setContent('');
     };
 
@@ -38,10 +40,7 @@ const HomeScreen: Component = () => {
             <div class="flex-it py-1 px-4 flex-row">
                 <div class="flex-it mr-4">
                     <div class="w-12 h-12 overflow-visible cursor-pointer transition duration-200 hover:opacity-80">
-                        <img
-                            class="rounded-full"
-                            src="https://www.pinclipart.com/picdir/middle/133-1331433_free-user-avatar-icons-happy-flat-design-png.png"
-                        ></img>
+                        <img class="rounded-full" src={user?.avatar}></img>
                     </div>
                 </div>
                 {/* MESSENGER START */}
