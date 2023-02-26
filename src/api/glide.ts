@@ -8,6 +8,9 @@ import {
     limit,
     orderBy,
     query,
+    QueryConstraint,
+    QueryDocumentSnapshot,
+    startAfter,
     Timestamp
 } from 'firebase/firestore';
 import { db } from '../db';
@@ -31,10 +34,15 @@ const createGlide = async (form: {
     return { ...glideToStore, id: added.id };
 };
 
-const getGlides = async () => {
-    const constraints = [orderBy('date', 'desc'), limit(10)];
+const getGlides = async (lastGlide: QueryDocumentSnapshot | null) => {
+    const constraints: QueryConstraint[] = [orderBy('date', 'desc'), limit(10)];
+
+    if (!!lastGlide) {
+        constraints.push(startAfter(lastGlide));
+    }
     const q = query(collection(db, 'glides'), ...constraints);
     const qSnapshot = await getDocs(q);
+    const _lastGlide = qSnapshot.docs[qSnapshot.docs.length - 1];
     const glides = await Promise.all(
         qSnapshot.docs.map(async (doc) => {
             const glide = doc.data() as Glide;
@@ -44,7 +52,7 @@ const getGlides = async () => {
         })
     );
 
-    return { glides };
+    return { glides, lastGlide: _lastGlide };
 };
 
 export { createGlide, getGlides };

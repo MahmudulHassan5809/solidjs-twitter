@@ -1,4 +1,5 @@
 import { FirebaseError } from 'firebase/app';
+import { QueryDocumentSnapshot } from 'firebase/firestore';
 import { createSignal, onMount } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { getGlides } from '../api/glide';
@@ -9,30 +10,41 @@ type State = {
         [key: string]: { glides: Glide[] };
     };
     loading: boolean;
+    lastGlide: QueryDocumentSnapshot | null;
 };
 
-const createInitialState = () => ({ pages: {}, loading: false });
+const createInitState = () => ({
+    pages: {},
+    loading: false,
+    lastGlide: null
+});
 
 const useGlides = () => {
     const [page, setPage] = createSignal(1);
-    const [store, setStore] = createStore<State>(createInitialState());
+    const [store, setStore] = createStore<State>(createInitState());
 
-    onMount(async () => {
-        await loadGlides();
+    onMount(() => {
+        loadGlides();
     });
 
     const loadGlides = async () => {
         const _page = page();
+
+        if (_page > 1 && !store.lastGlide) return;
+
         setStore('loading', true);
         try {
-            const { glides } = await getGlides();
+            const { glides, lastGlide } = await getGlides(store.lastGlide);
             if (glides.length > 0) {
                 setStore(
                     produce((store) => {
                         store.pages[_page] = { glides };
                     })
                 );
+
+                setPage(_page + 1);
             }
+            setStore('lastGlide', lastGlide);
             // setStore('glides', glides);
         } catch (error) {
             const message = (error as FirebaseError).message;
@@ -63,9 +75,9 @@ const useGlides = () => {
 
     return {
         page,
-        store,
+        loadGlides,
         addGlide,
-        loadGlides
+        store
     };
 };
 
