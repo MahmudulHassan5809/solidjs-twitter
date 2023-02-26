@@ -3,6 +3,7 @@ import { QueryDocumentSnapshot } from 'firebase/firestore';
 import { createSignal, onMount } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { getGlides } from '../api/glide';
+import { useAuthState } from '../contexts/auth';
 import { Glide } from '../types/Glide';
 
 type State = {
@@ -20,6 +21,7 @@ const createInitState = () => ({
 });
 
 const useGlides = () => {
+    const { user } = useAuthState()!;
     const [page, setPage] = createSignal(1);
     const [store, setStore] = createStore<State>(createInitState());
 
@@ -34,7 +36,10 @@ const useGlides = () => {
 
         setStore('loading', true);
         try {
-            const { glides, lastGlide } = await getGlides(store.lastGlide);
+            const { glides, lastGlide } = await getGlides(
+                user!,
+                store.lastGlide
+            );
             if (glides.length > 0) {
                 setStore(
                     produce((store) => {

@@ -11,7 +11,8 @@ import {
     QueryConstraint,
     QueryDocumentSnapshot,
     startAfter,
-    Timestamp
+    Timestamp,
+    where
 } from 'firebase/firestore';
 import { db } from '../db';
 import { Glide } from '../types/Glide';
@@ -34,9 +35,20 @@ const createGlide = async (form: {
     return { ...glideToStore, id: added.id };
 };
 
-const getGlides = async (lastGlide: QueryDocumentSnapshot | null) => {
+const getGlides = async (
+    loggedInUser: User,
+    lastGlide: QueryDocumentSnapshot | null
+) => {
+    const _loggedInUserDoc = doc(db, 'users', loggedInUser.uid);
     const constraints: QueryConstraint[] = [orderBy('date', 'desc'), limit(10)];
 
+    if (loggedInUser.followings.length > 0) {
+        constraints.push(
+            where('user', 'in', [...loggedInUser.followings, _loggedInUserDoc])
+        );
+    } else {
+        constraints.push(where('user', '==', _loggedInUserDoc));
+    }
     if (!!lastGlide) {
         constraints.push(startAfter(lastGlide));
     }
