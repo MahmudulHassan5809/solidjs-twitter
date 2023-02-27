@@ -58,6 +58,7 @@ const GlideDetail = () => {
                     </div>
                 </div>
             }
+            onGlideAdded={addGlide}
         >
             <Show when={!data.loading} fallback={<CenteredDataLoader />}>
                 <GlidePost glide={data()!} />

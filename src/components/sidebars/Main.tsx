@@ -6,8 +6,16 @@ import Popup from '../utils/Popup';
 import pageSize from '../../reactive/pageSize';
 import { RiDesignQuillPenLine } from 'solid-icons/ri';
 import { useAuthState } from '../../contexts/auth';
+import Modal from '../utils/Modal';
+import Messenger from '../utils/Messenger';
+import { Glide } from '../../types/Glide';
 
-const MainSidebar: Component = () => {
+type Props = {
+    onGlideAdded: (glide?: Glide) => void;
+    selectedGlide?: Glide;
+};
+
+const MainSidebar: Component<Props> = (props) => {
     const { user } = useAuthState()!;
     return (
         <header class="lg:flex-grow flex-it items-end">
@@ -44,18 +52,38 @@ const MainSidebar: Component = () => {
                                 </nav>
                             </div>
                             {/* GLIDER SEND-MESSAGE BUTTON */}
-                            <div class="my-1 flex-it w-10/12 cursor-pointer">
-                                <div class="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full flex-it transition">
-                                    <div class="flex-it flex-row text-xl font-bold text-white items-start justify-center truncate duration-200">
-                                        <Show
-                                            when={pageSize.isXl()}
-                                            fallback={<RiDesignQuillPenLine />}
-                                        >
-                                            <div>Glide It</div>
-                                        </Show>
+
+                            <Modal
+                                openComponent={(modalProps) => (
+                                    <div
+                                        onClick={() => modalProps.setOpen(true)}
+                                        class="my-1 flex-it w-10/12 cursor-pointer"
+                                    >
+                                        <div class="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full flex-it transition">
+                                            <div class="flex-it flex-row text-xl font-bold text-white items-start justify-center truncate duration-200">
+                                                <Show
+                                                    when={pageSize.isXl()}
+                                                    fallback={
+                                                        <RiDesignQuillPenLine />
+                                                    }
+                                                >
+                                                    <div>Glide It</div>
+                                                </Show>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                )}
+                            >
+                                {(modalProps) => (
+                                    <Messenger
+                                        answerTo={props.selectedGlide?.lookup}
+                                        onGlideAdded={(glide) => {
+                                            props.onGlideAdded(glide);
+                                            modalProps.setOpen(false);
+                                        }}
+                                    />
+                                )}
+                            </Modal>
                         </div>
                         {/* PROFILE MENU */}
                         <div class="flex-it  hover:cursor-pointer">
