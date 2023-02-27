@@ -1,20 +1,44 @@
 import { useParams } from '@solidjs/router';
 import { FaSolidArrowLeft } from 'solid-icons/fa';
-import { createResource, Show } from 'solid-js';
+import { createEffect, createResource, Show } from 'solid-js';
 import { getGlideById } from '../api/glide';
 import GlidePost from '../components/glides/GlidePost';
+import PaginatedGlides from '../components/glides/PaginatedGlides';
 import MainLayout from '../components/layouts/Main';
 import { CenteredDataLoader } from '../components/utils/DataLoader';
 import Messenger from '../components/utils/Messenger';
+import useSubglides from '../hooks/useSubglides';
 import { Glide } from '../types/Glide';
 import { User } from '../types/User';
 
 const GlideDetail = () => {
     const params = useParams();
-    const [data] = createResource(() => getGlideById(params.id, params.uid));
+    const { store, page, loadGlides, addGlide, resetPagination } =
+        useSubglides();
+    const [data, { mutate }] = createResource(() =>
+        getGlideById(params.id, params.uid)
+    );
     const user = () => data()?.user as User;
 
-    const onGlideAdded = (newGlide?: Glide) => {};
+    createEffect(() => {
+        const glide = data();
+        if (!data.loading && !!glide && !!glide.lookup) {
+            loadGlides(glide.lookup);
+        }
+    });
+
+    const onGlideAdded = (newGlide?: Glide) => {
+        const glide = data()!;
+        const glideWithNewCount = {
+            ...glide,
+            subGlidesCount: glide.subGlidesCount + 1
+        };
+
+        mutate(glideWithNewCount);
+        // persistence.setValue(`selectedGlide-${params.id}`, glideWithNewCount);
+
+        addGlide(newGlide);
+    };
 
     return (
         <MainLayout
@@ -39,6 +63,16 @@ const GlideDetail = () => {
                         onGlideAdded={onGlideAdded}
                     />
                 </div>
+
+                <PaginatedGlides
+                    page={page}
+                    pages={store.pages}
+                    loading={store.loading}
+                    loadMoreGlides={() => {
+                        const lookup = data()?.lookup!;
+                        return loadGlides(lookup);
+                    }}
+                />
             </Show>
         </MainLayout>
     );

@@ -4,14 +4,9 @@ import { createSignal, onMount } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { getGlides, subscribeToGlides } from '../api/glide';
 import { useAuthState } from '../contexts/auth';
-import { Glide } from '../types/Glide';
+import { Glide, UseGlideState } from '../types/Glide';
 
-type State = {
-    pages: {
-        [key: string]: { glides: Glide[] };
-    };
-    loading: boolean;
-    lastGlide: QueryDocumentSnapshot | null;
+type State = UseGlideState & {
     freshGlides: Glide[];
 };
 
