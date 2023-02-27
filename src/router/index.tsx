@@ -1,5 +1,6 @@
 import { Route, Routes } from '@solidjs/router';
 import { lazy } from 'solid-js';
+import GlideDetail from '../screens/GlideDetai';
 import HomeScreen from '../screens/Home';
 import ProfileScreen from '../screens/Profile';
 import AuthLayout from './layouts/AuthLayout';
@@ -14,6 +15,7 @@ const AppRouters = () => {
             <Route path="/" component={MainLayout}>
                 <Route path="" component={HomeScreen} />
                 <Route path="profile" component={ProfileScreen} />
+                <Route path="/:uid/glide/:id" component={GlideDetail} />
             </Route>
 
             <Route path="/auth" component={AuthLayout}>

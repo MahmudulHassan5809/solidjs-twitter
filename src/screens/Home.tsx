@@ -1,17 +1,42 @@
-import { Component } from 'solid-js';
+import { Component, onCleanup, onMount, Show } from 'solid-js';
 
 import MainLayout from '../components/layouts/Main';
 import Messenger from '../components/utils/Messenger';
 import useGlides from '../hooks/useGlides';
 import PaginatedGlides from '../components/glides/PaginatedGlides';
+import { Portal } from 'solid-js/web';
+import Button from '../components/utils/Button';
 
 const HomeScreen: Component = () => {
-    const { store, page, addGlide, loadGlides } = useGlides();
-    console.log(store.pages);
+    const {
+        store,
+        page,
+        addGlide,
+        loadGlides,
+        subscribeToNewGlides,
+        unsubscribeFromGlides,
+        displayFreshGlides
+    } = useGlides();
+    onMount(() => {
+        subscribeToNewGlides();
+    });
+
+    onCleanup(() => {
+        unsubscribeFromGlides();
+    });
     return (
         <MainLayout pageTitle="Home">
             <Messenger onGlideAdded={addGlide} />
             <div class="h-px bg-gray-700 my-1" />
+            <Show when={store.freshGlides.length >= 3}>
+                <Portal>
+                    <div class="fixed top-2 z-100 left-2/4 -translate-x-1/2">
+                        <Button onclick={displayFreshGlides}>
+                            <span>Read New Glides</span>
+                        </Button>
+                    </div>
+                </Portal>
+            </Show>
             <PaginatedGlides
                 page={page}
                 pages={store.pages}

@@ -1,8 +1,8 @@
 import { FirebaseError } from 'firebase/app';
-import { QueryDocumentSnapshot } from 'firebase/firestore';
+import { QueryDocumentSnapshot, Unsubscribe } from 'firebase/firestore';
 import { createSignal, onMount } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
-import { getGlides } from '../api/glide';
+import { getGlides, subscribeToGlides } from '../api/glide';
 import { useAuthState } from '../contexts/auth';
 import { Glide } from '../types/Glide';
 
@@ -12,18 +12,22 @@ type State = {
     };
     loading: boolean;
     lastGlide: QueryDocumentSnapshot | null;
+    freshGlides: Glide[];
 };
 
 const createInitState = () => ({
     pages: {},
     loading: false,
-    lastGlide: null
+    lastGlide: null,
+    freshGlides: []
 });
 
 const useGlides = () => {
     const { user } = useAuthState()!;
     const [page, setPage] = createSignal(1);
     const [store, setStore] = createStore<State>(createInitState());
+
+    let unSubscribe: Unsubscribe;
 
     onMount(() => {
         loadGlides();
@@ -59,6 +63,32 @@ const useGlides = () => {
         }
     };
 
+    const subscribeToNewGlides = async () => {
+        if (user?.followings.length === 0) {
+            return;
+        }
+        try {
+            unSubscribe = await subscribeToGlides(
+                user!,
+                (freshGlides: Glide[]) => {
+                    setStore('freshGlides', freshGlides);
+                    console.log(freshGlides);
+                }
+            );
+        } catch (error) {}
+    };
+
+    const unsubscribeFromGlides = () => {
+        if (!!unSubscribe) {
+            unSubscribe();
+        }
+    };
+
+    const reSubscribe = () => {
+        unsubscribeFromGlides();
+        subscribeToNewGlides();
+    };
+
     const addGlide = (glide: Glide | undefined) => {
         if (!glide) return;
         const page = 1;
@@ -78,11 +108,24 @@ const useGlides = () => {
         );
     };
 
+    const displayFreshGlides = () => {
+        store.freshGlides.forEach((freshGlide) => {
+            addGlide(freshGlide);
+        });
+
+        setStore('freshGlides', []);
+        reSubscribe();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     return {
         page,
         loadGlides,
         addGlide,
-        store
+        subscribeToNewGlides,
+        store,
+        unsubscribeFromGlides,
+        displayFreshGlides
     };
 };
 

@@ -1,15 +1,19 @@
 import { FaRegularImage } from 'solid-icons/fa';
-import { Component } from 'solid-js';
+import { Component, mergeProps, Show } from 'solid-js';
 import { useAuthState } from '../../contexts/auth';
 import useMessenger from '../../hooks/useMessenger';
 import { GliderInputEvent } from '../../types/Form';
 import { Glide } from '../../types/Glide';
+import Button from './Button';
 
 type Props = {
     onGlideAdded: (g: Glide | undefined) => void;
+    showAvatar?: boolean;
+    answerTo?: string;
 };
 
-const Messenger: Component<Props> = ({ onGlideAdded }) => {
+const Messenger: Component<Props> = (initialProps) => {
+    const props = mergeProps({ showAvatar: true }, initialProps);
     const { user } = useAuthState()!;
     const { handleInput, handleSubmit, form, loading } = useMessenger();
 
@@ -24,11 +28,13 @@ const Messenger: Component<Props> = ({ onGlideAdded }) => {
 
     return (
         <div class="flex-it py-1 px-4 flex-row">
-            <div class="flex-it mr-4">
-                <div class="w-12 h-12 overflow-visible cursor-pointer transition duration-200 hover:opacity-80">
-                    <img class="rounded-full" src={user?.avatar}></img>
+            <Show when={props.showAvatar}>
+                <div class="flex-it mr-4">
+                    <div class="w-12 h-12 overflow-visible cursor-pointer transition duration-200 hover:opacity-80">
+                        <img class="rounded-full" src={user?.avatar}></img>
+                    </div>
                 </div>
-            </div>
+            </Show>
             {/* MESSENGER START */}
             <div class="flex-it flex-grow">
                 <div class="flex-it">
@@ -53,19 +59,15 @@ const Messenger: Component<Props> = ({ onGlideAdded }) => {
                         </div>
                     </div>
                     <div class="flex-it w-32 mt-3 cursor-pointer">
-                        <button
+                        <Button
                             disabled={sendDisabled()}
                             onClick={async () => {
                                 const glide = await handleSubmit();
-                                onGlideAdded(glide);
+                                props.onGlideAdded(glide);
                             }}
-                            type="button"
-                            class="disabled:cursor-not-allowed disabled:bg-gray-400 bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full flex-it transition duration-200"
                         >
-                            <div class="flex-it flex-row text-sm font-bold text-white items-start justify-center">
-                                <span>Glide It</span>
-                            </div>
-                        </button>
+                            <span>Glide It</span>
+                        </Button>
                     </div>
                 </div>
             </div>
