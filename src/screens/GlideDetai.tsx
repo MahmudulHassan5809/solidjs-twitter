@@ -13,19 +13,21 @@ import { User } from '../types/User';
 
 const GlideDetail = () => {
     const params = useParams();
+
+    const onGlideLoaded = (glide: Glide) => {
+        resetPagination();
+        loadGlides(glide.lookup!);
+    };
+
+    const [data, { mutate, refetch }] = createResource(async () => {
+        const glide = await getGlideById(params.id, params.uid);
+        onGlideLoaded(glide);
+        return glide;
+    });
+
     const { store, page, loadGlides, addGlide, resetPagination } =
         useSubglides();
-    const [data, { mutate }] = createResource(() =>
-        getGlideById(params.id, params.uid)
-    );
     const user = () => data()?.user as User;
-
-    createEffect(() => {
-        const glide = data();
-        if (!data.loading && !!glide && !!glide.lookup) {
-            loadGlides(glide.lookup);
-        }
-    });
 
     const onGlideAdded = (newGlide?: Glide) => {
         const glide = data()!;
@@ -39,6 +41,12 @@ const GlideDetail = () => {
 
         addGlide(newGlide);
     };
+
+    createEffect(() => {
+        if (!data.loading && data()?.id !== params.id) {
+            refetch();
+        }
+    });
 
     return (
         <MainLayout
