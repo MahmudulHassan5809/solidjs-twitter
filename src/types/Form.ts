@@ -11,7 +11,19 @@ export type FormErrors = {
     [key: string]: string[];
 };
 
+export type GliderFileEvent = {
+    target: Element & { files?: FileList };
+    currentTarget: HTMLInputElement;
+};
+
+export type UploadImage = {
+    buffer: ArrayBuffer;
+    name: string;
+    previewUrl: string;
+};
+
 export type MessengerForm = {
+    mediaUrl?: string;
     content: string;
 } & Form;
 

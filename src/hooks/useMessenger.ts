@@ -1,14 +1,21 @@
 import { FirebaseError } from 'firebase/app';
 import { createSignal } from 'solid-js';
 import { createStore } from 'solid-js/store';
-import { createGlide } from '../api/glide';
+import { createGlide, uploadImage } from '../api/glide';
 import { useAuthState } from '../contexts/auth';
 import { useUIDispatch } from '../contexts/ui';
-import { GliderInputEvent, MessengerForm } from '../types/Form';
+import { GliderInputEvent, MessengerForm, UploadImage } from '../types/Form';
+
+const defaultImage = () => ({
+    buffer: new ArrayBuffer(0),
+    name: '',
+    previewUrl: ''
+});
 
 const useMessenger = (answerTo?: string) => {
     const { isAuthenticated, user } = useAuthState()!;
     const { addSnackbar } = useUIDispatch();
+    const [image, setImage] = createSignal<UploadImage>(defaultImage());
     const [loading, setLoading] = createSignal(false);
     const [form, setForm] = createStore<MessengerForm>({
         content: ''
@@ -34,6 +41,11 @@ const useMessenger = (answerTo?: string) => {
         };
 
         try {
+            if (image().buffer.byteLength > 0) {
+                const downloadUrl = await uploadImage(image());
+                glide.mediaUrl = downloadUrl;
+            }
+
             const newGlide = await createGlide(glide, answerTo);
             newGlide.user = {
                 nickName: user!.nickName,
@@ -41,6 +53,7 @@ const useMessenger = (answerTo?: string) => {
             };
             addSnackbar({ message: 'Glide added', type: 'success' });
             setForm({ content: '' });
+            setImage(defaultImage());
             return newGlide;
         } catch (error) {
             const message = (error as FirebaseError).message;
@@ -49,7 +62,7 @@ const useMessenger = (answerTo?: string) => {
             setLoading(false);
         }
     };
-    return { handleInput, handleSubmit, form, loading };
+    return { handleInput, handleSubmit, form, loading, image, setImage };
 };
 
 export default useMessenger;

@@ -8,6 +8,7 @@ import { User } from './User';
 export interface Glide {
     id: string;
     uid: string;
+    mediaUrl?: string;
     lookup?: string;
     content: string;
     user: Partial<User> | DocumentReference;

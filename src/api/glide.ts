@@ -18,7 +18,9 @@ import {
     updateDoc,
     where
 } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db } from '../db';
+import { UploadImage } from '../types/Form';
 import { Glide, UserGlide } from '../types/Glide';
 import { User } from '../types/User';
 
@@ -176,10 +178,20 @@ const getSubglides = async (
     };
 };
 
+const uploadImage = async (image: UploadImage) => {
+    const storage = getStorage();
+    const storageRef = ref(storage, image.name);
+
+    const uploadResult = await uploadBytes(storageRef, image.buffer);
+    const downloadUrl = await getDownloadURL(uploadResult.ref);
+    return downloadUrl;
+};
+
 export {
     createGlide,
     getGlides,
     subscribeToGlides,
     getGlideById,
-    getSubglides
+    getSubglides,
+    uploadImage
 };
